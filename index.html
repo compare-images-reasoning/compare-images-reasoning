@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dot-in-Region Verification Study</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+
+        img {
+            display: block;
+            margin: 20px 0;
+            max-width: 100%;
+        }
+
+        #completion,
+        #submitting,
+        #task {
+            display: none;
+        }
+
+        #instructions-panel {
+            display: none;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            background: #f9f9f9;
+        }
+
+        #intro {
+            border: 1px solid #ccc;
+            padding: 20px;
+            background: #f0f0f0;
+            margin-bottom: 20px;
+        }
+
+        button,
+        input {
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        #startButton[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Image Point Verification</h1>
+
+    <!-- 1) Intro screen -->
+    <div id="intro">
+        <h2>Welcome to the Study!</h2>
+        <p>Please enter your Participant ID to begin:</p>
+        <input type="text" id="participantIdInput" placeholder="e.g. abc123" />
+        <p>In this study, you will see an image with a <strong>blue circle</strong>, plus
+        a sentence describing a region in the image. The sentence will refer to an object or location in the image — for
+        example, "the chair on the left side of the room." The sentence will include a phrase "[shown with blue
+        circle]" to indicate which part of the sentence corresponds to what you should be looking for in the blue circle.</p>
+        <p>Your task is to:</p>
+        <ul>
+            <li>Choose <strong>"Yes"</strong> if <u>any part</u> of the described region is inside the blue circle.</li>
+            <li>Choose <strong>"No"</strong> if the described object or region is <u>completely outside</u> the blue circle.</li>
+            <li>Choose <strong>"Unsure"</strong> if you are unsure or the sentence region is ambiguous.</li>
+        </ul>
+        <p>For example, if the sentence describes a chair, and a chair is inside or partially inside the blue circle, choose "Yes".</p>
+        <p>Some images may have dots or lines on them with numbers or symbols. These should be ignored unless they are part of the sentence description.</p>
+
+        <div class="example-section">
+            <h3>Example</h3>
+            <p>Here's an example to help you understand:</p>
+            <img src="data/examples/val_Counting_16_1.png" alt="Example image with blue circle" style="max-width: 100%;">
+            <div class="example-items">
+                <div class="example-item">
+                    <p><strong>Sentence:</strong> "I will examine the school bus [shown with blue circle]"</p>
+                    <p><strong>Answer:</strong> Yes - because the blue circle overlaps with the school bus</p>
+                </div>
+                <div class="example-item">
+                    <p><strong>Sentence:</strong> "Let's look at the people standing around [shown with blue circle]"</p>
+                    <p><strong>Answer:</strong> No - because the people are completely outside the blue circle</p>
+                </div>
+            </div>
+        </div>
+
+        <button id="startButton" disabled>Start Study</button>
+    </div>
+
+    <!-- 2) Main task -->
+    <div id="task">
+        <button id="toggleInstructions">Show Instructions</button>
+        <div id="instructions-panel">
+            <h3>Detailed Instructions</h3>
+            <p>In this study, you will see an image with a <strong>blue circle</strong>, plus
+            a sentence describing a region in the image. The sentence will refer to an object or location in the image — for
+            example, "the chair on the left side of the room." The sentence will include a phrase "[shown with blue
+            circle]" to indicate which part of the sentence corresponds to what you should be looking for in the blue circle.</p>
+            <p>Your task is to:</p>
+            <ul>
+                <li>Choose <strong>"Yes"</strong> if <u>any part</u> of the described region is inside the blue circle.</li>
+                <li>Choose <strong>"No"</strong> if the described object or region is <u>completely outside</u> the blue circle.</li>
+                <li>Choose <strong>"Unsure"</strong> if you are unsure or the sentence region is ambiguous.</li>
+            </ul>
+            <p>For example, if the sentence describes a chair, and a chair is inside or partially inside the blue circle, choose
+                "Yes".</p>
+            <p>Some images may have dots or lines on them with numbers or symbols. These should be ignored unless they are part of the
+                sentence description.</p>
+            
+            <div class="example-section">
+                <h3>Example</h3>
+                <p>Here's an example to help you understand:</p>
+                <img src="data/examples/val_Counting_16_1.png" alt="Example image with blue circle" style="max-width: 100%;">
+                <div class="example-items">
+                    <div class="example-item">
+                        <p><strong>Sentence:</strong> "I will examine the school bus [shown with blue circle]"</p>
+                        <p><strong>Answer:</strong> Yes - because the blue circle overlaps with the school bus</p>
+                    </div>
+                    <div class="example-item">
+                        <p><strong>Sentence:</strong> "Let's look at the people standing around [shown with blue circle]"</p>
+                        <p><strong>Answer:</strong> No - because the people are completely outside the blue circle</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <p id="progress"></p>
+        <p id="sentence"></p>
+        <img id="image" src="" alt="Task image">
+    
+        <form id="responseForm">
+            <fieldset id="responseOptions" disabled>
+                <label><input type="radio" name="answer" value="Yes" required> Yes</label><br>
+                <label><input type="radio" name="answer" value="No"> No</label><br>
+                <label><input type="radio" name="answer" value="Unsure"> Unsure</label><br>
+                <div style="margin-top: 15px;"></div>
+                <button type="submit" id="nextButton" disabled>Next</button>
+            </fieldset>
+        </form>
+    </div>
+
+    <!-- 3) Submitting screen -->
+    <div id="submitting">
+        <h2>All done!</h2>
+        <p>Saving your responses now. Please wait a second for your confirmation code…</p>
+    </div>
+
+    <!-- 4) Completion screen -->
+    <div id="completion">
+        <h2>Thank you!</h2>
+        <p>Your completion code is: <strong>CR510SPY</strong></p>
+    </div>
+
+    <script>
+        (async function () {
+            const STUDY = 'mturk_mcts_bllink';
+            const DATA_PATH = `data/${STUDY}/data.jsonl`;
+            const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycby93WIxDfo4fx1Mvl2UO84MUO9qI3JMKWp6MAIW3wY35BA5aXCPSjiHUdmLR_CxK1N-5A/exec';
+
+            // Participant ID
+            let participantId = '';
+            const idInput = document.getElementById('participantIdInput');
+            const startButton = document.getElementById('startButton');
+            idInput.addEventListener('input', () => {
+                startButton.disabled = idInput.value.trim() === '';
+            });
+
+            // Preload trials
+            const raw = await fetch(DATA_PATH).then(r => r.text());
+            const trials = raw.trim().split('\n').map(l => JSON.parse(l));
+
+            // Element refs
+            const introDiv = document.getElementById('intro');
+            const taskDiv = document.getElementById('task');
+            const submitDiv = document.getElementById('submitting');
+            const compDiv = document.getElementById('completion');
+            const toggleBtn = document.getElementById('toggleInstructions');
+            const instrDiv = document.getElementById('instructions-panel');
+            const progressEl = document.getElementById('progress');
+            const sentenceEl = document.getElementById('sentence');
+            const imageEl = document.getElementById('image');
+            const form = document.getElementById('responseForm');
+            const fieldset = document.getElementById('responseOptions');
+            const nextBtn = document.getElementById('nextButton');
+
+            // Start study
+            startButton.onclick = () => {
+                participantId = idInput.value.trim();
+                introDiv.style.display = 'none';
+                taskDiv.style.display = 'block';
+                showTrial();
+            };
+
+            // Toggle instructions
+            toggleBtn.onclick = () => {
+                const show = instrDiv.style.display !== 'block';
+                instrDiv.style.display = show ? 'block' : 'none';
+                toggleBtn.textContent = show ? 'Hide Instructions' : 'Show Instructions';
+            };
+
+            let idx = 0, responses = [];
+
+            function showTrial() {
+                const t = trials[idx];
+                progressEl.textContent = `Trial ${idx + 1} of ${trials.length}`;
+                sentenceEl.textContent = `Sentence: ${t.sentence}`;
+                fieldset.disabled = true;
+                nextBtn.disabled = true;
+                imageEl.onload = () => {
+                    fieldset.disabled = false;
+                    nextBtn.disabled = false;
+                };
+                imageEl.src = t.img_path;
+                form.reset();
+            }
+
+            form.addEventListener('submit', async e => {
+                e.preventDefault();
+                responses.push({ id: trials[idx].id, answer: form.answer.value });
+                idx++;
+                if (idx < trials.length) {
+                    showTrial();
+                } else {
+                    // show submitting screen
+                    taskDiv.style.display = 'none';
+                    submitDiv.style.display = 'block';
+
+                    // send payload
+                    const payload = {
+                        participantId,
+                        timestamp: new Date().toISOString(),
+                        responses
+                    };
+                    await fetch(SUBMIT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    // then show completion code
+                    submitDiv.style.display = 'none';
+                    compDiv.style.display = 'block';
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>
